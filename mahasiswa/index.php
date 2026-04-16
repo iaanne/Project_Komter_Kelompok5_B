@@ -25,8 +25,12 @@ switch($active_db) {
 }
 
 // Ambil data
-$stmt = $pdo->query("SELECT * FROM mahasiswa");
-$mahasiswa = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $pdo->query("SELECT * FROM mahasiswa");
+    $mahasiswa = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    $mahasiswa = [];
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -35,6 +39,15 @@ $mahasiswa = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../dashboard.php?db=<?= $active_db ?>">Sistem Akademik</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="../logout.php">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
     <div class="container mt-4">
         <div class="card">
             <div class="card-header bg-primary text-white">
@@ -48,17 +61,21 @@ $mahasiswa = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr><th>NIM</th><th>Nama</th><th>Alamat</th><th>Aksi</th></tr>
                     </thead>
                     <tbody>
-                        <?php foreach($mahasiswa as $mhs): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($mhs['nim']) ?></td>
-                            <td><?= htmlspecialchars($mhs['nama']) ?></td>
-                            <td><?= htmlspecialchars($mhs['alamat']) ?></td>
-                            <td>
-                                <a href="edit.php?db=<?= $active_db ?>&nim=<?= $mhs['nim'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="delete.php?db=<?= $active_db ?>&nim=<?= $mhs['nim'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin?')">Hapus</a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                        <?php if(count($mahasiswa) > 0): ?>
+                            <?php foreach($mahasiswa as $mhs): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($mhs['nim'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($mhs['nama'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($mhs['alamat'] ?? '-') ?></td>
+                                <td>
+                                    <a href="edit.php?db=<?= $active_db ?>&nim=<?= $mhs['nim'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="delete.php?db=<?= $active_db ?>&nim=<?= $mhs['nim'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin?')">Hapus</a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="4" class="text-center">Tidak ada data mahasiswa.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

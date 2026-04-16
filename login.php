@@ -1,21 +1,17 @@
 <?php
 session_start();
 
-// Default users (bisa diganti dengan database)
-$users = [
-    'admin' => password_hash('admin123', PASSWORD_DEFAULT),
-    'user' => password_hash('user123', PASSWORD_DEFAULT)
-];
+require_once 'includes/auth.php';
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = isset($_POST['username']) ? $_POST['username'] : '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
     
-    if (isset($users[$username]) && password_verify($password, $users[$username])) {
-        $_SESSION['username'] = $username;
-        $_SESSION['logged_in'] = true;
+    if (!$username || !$password) {
+        $error = 'Username dan password harus diisi!';
+    } elseif (authenticateUser($username, $password)) {
         header('Location: dashboard.php');
         exit();
     } else {
@@ -43,24 +39,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <?php if($error): ?>
                             <div class="alert alert-danger"><?= $error ?></div>
                         <?php endif; ?>
-                        <form method="POST">
+                        <form method="POST" autocomplete="off">
                             <div class="mb-3">
                                 <label>Username</label>
-                                <input type="text" name="username" class="form-control" required>
+                                <input type="text" name="username" id="username" class="form-control" autocomplete="off" spellcheck="false" required>
                             </div>
                             <div class="mb-3">
                                 <label>Password</label>
-                                <input type="password" name="password" class="form-control" required>
+                                <input type="password" name="password" id="password" class="form-control" autocomplete="new-password" required>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Login</button>
                         </form>
-                        <div class="mt-3 text-center">
-                            <small>Demo: admin/admin123 atau user/user123</small>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        // Clear autofilled values on page load
+        window.addEventListener('load', function() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        });
+    </script>
 </body>
 </html>

@@ -24,23 +24,15 @@ switch($active_db) {
         $pdo = $pdo_mysql;
 }
 
-// Ambil data kuliah dengan join
-if($active_db == 'sqlsrv') {
-    $sql = "SELECT k.id, k.nim, m.nama as nama_mhs, k.kode_mk, mk.nama_mk, k.nip, d.nama as nama_dsn, k.nilai 
-            FROM kuliah k 
-            JOIN mahasiswa m ON k.nim = m.nim 
-            JOIN matakuliah mk ON k.kode_mk = mk.kode_mk 
-            JOIN dosen d ON k.nip = d.nip";
-} else {
-    $sql = "SELECT k.id, k.nim, m.nama as nama_mhs, k.kode_mk, mk.nama_mk, k.nip, d.nama as nama_dsn, k.nilai 
-            FROM kuliah k 
-            JOIN mahasiswa m ON k.nim = m.nim 
-            JOIN matakuliah mk ON k.kode_mk = mk.kode_mk 
-            JOIN dosen d ON k.nip = d.nip";
-}
+// Ambil data kuliah
+$sql = "SELECT * FROM kuliah";
 
-$stmt = $pdo->query($sql);
-$kuliah = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $pdo->query($sql);
+    $kuliah = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    $kuliah = [];
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -68,22 +60,26 @@ $kuliah = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 
                 <table class="table table-bordered">
                     <thead>
-                        <tr><th>ID</th><th>Mahasiswa</th><th>Matakuliah</th><th>Dosen</th><th>Nilai</th><th>Aksi</th></tr>
+                        <tr><th>ID</th><th>NIM</th><th>Kode MK</th><th>NIP</th><th>Nilai</th><th>Aksi</th></tr>
                     </thead>
                     <tbody>
-                        <?php foreach($kuliah as $k): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($k['id']) ?></td>
-                            <td><?= htmlspecialchars($k['nim'] . ' - ' . $k['nama_mhs']) ?></td>
-                            <td><?= htmlspecialchars($k['kode_mk'] . ' - ' . $k['nama_mk']) ?></td>
-                            <td><?= htmlspecialchars($k['nip'] . ' - ' . $k['nama_dsn']) ?></td>
-                            <td><?= htmlspecialchars($k['nilai']) ?></td>
-                            <td>
-                                <a href="edit.php?db=<?= $active_db ?>&id=<?= $k['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="delete.php?db=<?= $active_db ?>&id=<?= $k['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin?')">Hapus</a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                        <?php if(count($kuliah) > 0): ?>
+                            <?php foreach($kuliah as $k): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($k['id'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($k['nim'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($k['kodeMK'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($k['nip'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($k['nilai'] ?? '-') ?></td>
+                                <td>
+                                    <a href="edit.php?db=<?= $active_db ?>&id=<?= $k['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="delete.php?db=<?= $active_db ?>&id=<?= $k['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin?')">Hapus</a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="6" class="text-center">Tidak ada data kuliah.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

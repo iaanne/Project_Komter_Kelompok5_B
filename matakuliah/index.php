@@ -25,8 +25,12 @@ switch($active_db) {
 }
 
 // Ambil data
-$stmt = $pdo->query("SELECT * FROM matakuliah");
-$matakuliah = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $pdo->query("SELECT * FROM matkul");
+    $matakuliah = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    $matakuliah = [];
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -57,17 +61,21 @@ $matakuliah = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr><th>Kode MK</th><th>Nama Matakuliah</th><th>SKS</th><th>Aksi</th></tr>
                     </thead>
                     <tbody>
-                        <?php foreach($matakuliah as $mk): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($mk['kode_mk']) ?></td>
-                            <td><?= htmlspecialchars($mk['nama_mk']) ?></td>
-                            <td><?= htmlspecialchars($mk['sks']) ?></td>
-                            <td>
-                                <a href="edit.php?db=<?= $active_db ?>&kode_mk=<?= $mk['kode_mk'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="delete.php?db=<?= $active_db ?>&kode_mk=<?= $mk['kode_mk'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin?')">Hapus</a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                        <?php if(count($matakuliah) > 0): ?>
+                            <?php foreach($matakuliah as $mk): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($mk['kodeMK'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($mk['namaMK'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($mk['sks'] ?? '-') ?></td>
+                                <td>
+                                    <a href="edit.php?db=<?= $active_db ?>&kodeMK=<?= $mk['kodeMK'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="delete.php?db=<?= $active_db ?>&kodeMK=<?= $mk['kodeMK'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin?')">Hapus</a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="4" class="text-center">Tidak ada data matakuliah.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

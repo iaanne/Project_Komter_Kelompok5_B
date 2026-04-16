@@ -6,7 +6,7 @@ if(!isset($_SESSION['logged_in'])) {
 }
 
 $active_db = $_GET['db'] ?? 'mysql';
-$kode_mk = $_GET['kode_mk'];
+$kodeMK = $_GET['kodeMK'];
 
 switch($active_db) {
     case 'pgsql':
@@ -23,9 +23,9 @@ switch($active_db) {
 }
 
 try {
-    $sql = "DELETE FROM matakuliah WHERE kode_mk = :kode_mk";
+    $sql = "DELETE FROM matkul WHERE kodeMK = :kodeMK";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([':kode_mk' => $kode_mk]);
+    $stmt->execute([':kodeMK' => $kodeMK]);
     $_SESSION['message'] = "Data berhasil dihapus!";
 } catch(PDOException $e) {
     $_SESSION['error'] = "Gagal hapus data: " . $e->getMessage();

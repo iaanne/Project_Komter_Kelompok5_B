@@ -38,21 +38,21 @@ if(!$k) {
 
 // Ambil data untuk dropdown
 $mahasiswa = $pdo->query("SELECT nim, nama FROM mahasiswa")->fetchAll(PDO::FETCH_ASSOC);
-$matakuliah = $pdo->query("SELECT kode_mk, nama_mk FROM matakuliah")->fetchAll(PDO::FETCH_ASSOC);
+$matakuliah = $pdo->query("SELECT kodeMK, namaMK FROM matkul")->fetchAll(PDO::FETCH_ASSOC);
 $dosen = $pdo->query("SELECT nip, nama FROM dosen")->fetchAll(PDO::FETCH_ASSOC);
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nim = $_POST['nim'];
-    $kode_mk = $_POST['kode_mk'];
+    $kodeMK = $_POST['kodeMK'];
     $nip = $_POST['nip'];
     $nilai = $_POST['nilai'];
     
     try {
-        $sql = "UPDATE kuliah SET nim = :nim, kode_mk = :kode_mk, nip = :nip, nilai = :nilai WHERE id = :id";
+        $sql = "UPDATE kuliah SET nim = :nim, kodeMK = :kodeMK, nip = :nip, nilai = :nilai WHERE id = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':nim' => $nim,
-            ':kode_mk' => $kode_mk,
+            ':kodeMK' => $kodeMK,
             ':nip' => $nip,
             ':nilai' => $nilai,
             ':id' => $id
@@ -113,10 +113,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                             <div class="mb-3">
                                 <label>Matakuliah</label>
-                                <select name="kode_mk" class="form-control" required>
+                                <select name="kodeMK" class="form-control" required>
                                     <option value="">Pilih Matakuliah</option>
                                     <?php foreach($matakuliah as $mk): ?>
-                                        <option value="<?= $mk['kode_mk'] ?>" <?= $mk['kode_mk'] == $k['kode_mk'] ? 'selected' : '' ?>><?= $mk['kode_mk'] ?> - <?= $mk['nama_mk'] ?></option>
+                                        <option value="<?= $mk['kodeMK'] ?>" <?= $mk['kodeMK'] == $k['kodeMK'] ? 'selected' : '' ?>><?= $mk['kodeMK'] ?> - <?= $mk['namaMK'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>

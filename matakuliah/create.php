@@ -25,22 +25,29 @@ $message = '';
 $error = '';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $kode_mk = $_POST['kode_mk'];
-    $nama_mk = $_POST['nama_mk'];
-    $sks = $_POST['sks'];
+    $kodeMK = isset($_POST['kodeMK']) ? $_POST['kodeMK'] : '';
+    $namaMK = isset($_POST['namaMK']) ? $_POST['namaMK'] : '';
+    $sks = isset($_POST['sks']) ? $_POST['sks'] : '';
+    $smt = isset($_POST['smt']) ? $_POST['smt'] : '';
+    
+    if(!$kodeMK || !$namaMK || !$sks || !$smt) {
+        $error = "Semua field harus diisi!";
+    } else {
     
     try {
-        $sql = "INSERT INTO matakuliah (kode_mk, nama_mk, sks) VALUES (:kode_mk, :nama_mk, :sks)";
+        $sql = "INSERT INTO matkul (kodeMK, namaMK, sks, smt) VALUES (:kodeMK, :namaMK, :sks, :smt)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':kode_mk' => $kode_mk,
-            ':nama_mk' => $nama_mk,
-            ':sks' => $sks
+            ':kodeMK' => $kodeMK,
+            ':namaMK' => $namaMK,
+            ':sks' => $sks,
+            ':smt' => $smt
         ]);
         $message = "Data matakuliah berhasil ditambahkan!";
         header("refresh:2;url=index.php?db=$active_db");
     } catch(PDOException $e) {
         $error = "Gagal menambah data: " . $e->getMessage();
+    }
     }
 }
 ?>
@@ -80,15 +87,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <form method="POST">
                             <div class="mb-3">
                                 <label>Kode Matakuliah</label>
-                                <input type="text" name="kode_mk" class="form-control" required maxlength="10">
+                                <input type="text" name="kodeMK" class="form-control" required maxlength="10">
                             </div>
                             <div class="mb-3">
                                 <label>Nama Matakuliah</label>
-                                <input type="text" name="nama_mk" class="form-control" required>
+                                <input type="text" name="namaMK" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label>SKS</label>
                                 <input type="number" name="sks" class="form-control" required min="1" max="6">
+                            </div>
+                            <div class="mb-3">
+                                <label>Semester</label>
+                                <input type="number" name="smt" class="form-control" required min="1" max="8">
                             </div>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                             <a href="index.php?db=<?= $active_db ?>" class="btn btn-secondary">Batal</a>

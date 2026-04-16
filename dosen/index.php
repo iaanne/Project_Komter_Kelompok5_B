@@ -25,8 +25,12 @@ switch($active_db) {
 }
 
 // Ambil data
-$stmt = $pdo->query("SELECT * FROM dosen");
-$dosen = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $pdo->query("SELECT * FROM dosen");
+    $dosen = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    $dosen = [];
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -57,17 +61,21 @@ $dosen = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr><th>NIP</th><th>Nama</th><th>Alamat</th><th>Aksi</th></tr>
                     </thead>
                     <tbody>
-                        <?php foreach($dosen as $dsn): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($dsn['nip']) ?></td>
-                            <td><?= htmlspecialchars($dsn['nama']) ?></td>
-                            <td><?= htmlspecialchars($dsn['alamat']) ?></td>
-                            <td>
-                                <a href="edit.php?db=<?= $active_db ?>&nip=<?= $dsn['nip'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="delete.php?db=<?= $active_db ?>&nip=<?= $dsn['nip'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin?')">Hapus</a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                        <?php if(count($dosen) > 0): ?>
+                            <?php foreach($dosen as $dsn): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($dsn['nip'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($dsn['nama'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($dsn['alamat'] ?? '-') ?></td>
+                                <td>
+                                    <a href="edit.php?db=<?= $active_db ?>&nip=<?= $dsn['nip'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="delete.php?db=<?= $active_db ?>&nip=<?= $dsn['nip'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin?')">Hapus</a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="4" class="text-center">Tidak ada data dosen.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

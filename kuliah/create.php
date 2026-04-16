@@ -25,22 +25,43 @@ $message = '';
 $error = '';
 
 // Ambil data untuk dropdown
-$mahasiswa = $pdo->query("SELECT nim, nama FROM mahasiswa")->fetchAll(PDO::FETCH_ASSOC);
-$matakuliah = $pdo->query("SELECT kode_mk, nama_mk FROM matakuliah")->fetchAll(PDO::FETCH_ASSOC);
-$dosen = $pdo->query("SELECT nip, nama FROM dosen")->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $mahasiswa = $pdo->query("SELECT nim, nama FROM mahasiswa")->fetchAll(PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    $mahasiswa = [];
+    $error = "Error fetching mahasiswa: " . $e->getMessage();
+}
+
+try {
+    $matakuliah = $pdo->query("SELECT kodeMK, namaMK FROM matkul")->fetchAll(PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    $matakuliah = [];
+    $error = "Error fetching matakuliah: " . $e->getMessage();
+}
+
+try {
+    $dosen = $pdo->query("SELECT nip, nama FROM dosen")->fetchAll(PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    $dosen = [];
+    $error = "Error fetching dosen: " . $e->getMessage();
+}
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nim = $_POST['nim'];
-    $kode_mk = $_POST['kode_mk'];
-    $nip = $_POST['nip'];
-    $nilai = $_POST['nilai'];
+    $nim = isset($_POST['nim']) ? $_POST['nim'] : '';
+    $kodeMK = isset($_POST['kodeMK']) ? $_POST['kodeMK'] : '';
+    $nip = isset($_POST['nip']) ? $_POST['nip'] : '';
+    $nilai = isset($_POST['nilai']) ? $_POST['nilai'] : '';
+    
+    if(!$nim || !$kodeMK || !$nip || !$nilai) {
+        $error = "Semua field harus diisi!";
+    } else {
     
     try {
-        $sql = "INSERT INTO kuliah (nim, kode_mk, nip, nilai) VALUES (:nim, :kode_mk, :nip, :nilai)";
+        $sql = "INSERT INTO kuliah (nim, kodeMK, nip, nilai) VALUES (:nim, :kodeMK, :nip, :nilai)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':nim' => $nim,
-            ':kode_mk' => $kode_mk,
+            ':kodeMK' => $kodeMK,
             ':nip' => $nip,
             ':nilai' => $nilai
         ]);
@@ -48,6 +69,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         header("refresh:2;url=index.php?db=$active_db");
     } catch(PDOException $e) {
         $error = "Gagal menambah data: " . $e->getMessage();
+    }
     }
 }
 ?>
@@ -96,10 +118,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                             <div class="mb-3">
                                 <label>Matakuliah</label>
-                                <select name="kode_mk" class="form-control" required>
+                                <select name="kodeMK" class="form-control" required>
                                     <option value="">Pilih Matakuliah</option>
                                     <?php foreach($matakuliah as $mk): ?>
-                                        <option value="<?= $mk['kode_mk'] ?>"><?= $mk['kode_mk'] ?> - <?= $mk['nama_mk'] ?></option>
+                                        <option value="<?= $mk['kodeMK'] ?>"><?= $mk['kodeMK'] ?> - <?= $mk['namaMK'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>

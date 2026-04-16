@@ -9,7 +9,7 @@ $active_db = $_GET['db'] ?? 'mysql';
 
 switch($active_db) {
     case 'pgsql':
-        require_once '../config/postgresql.php';
+        require_once '../config/pgsql.php';
         $pdo = $pdo_pgsql;
         break;
     case 'sqlsrv':
@@ -25,9 +25,13 @@ $message = '';
 $error = '';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nim = $_POST['nim'];
-    $nama = $_POST['nama'];
-    $alamat = $_POST['alamat'];
+    $nim = isset($_POST['nim']) ? $_POST['nim'] : '';
+    $nama = isset($_POST['nama']) ? $_POST['nama'] : '';
+    $alamat = isset($_POST['alamat']) ? $_POST['alamat'] : '';
+    
+    if(!$nim || !$nama || !$alamat) {
+        $error = "Semua field harus diisi!";
+    } else {
     
     try {
         $sql = "INSERT INTO mahasiswa (nim, nama, alamat) VALUES (:nim, :nama, :alamat)";
@@ -41,6 +45,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         header("refresh:2;url=index.php?db=$active_db");
     } catch(PDOException $e) {
         $error = "Gagal menambah data: " . $e->getMessage();
+    }
     }
 }
 ?>

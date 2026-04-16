@@ -10,7 +10,7 @@ $nim = $_GET['nim'];
 
 switch($active_db) {
     case 'pgsql':
-        require_once '../config/postgresql.php';
+        require_once '../config/pgsql.php';
         $pdo = $pdo_pgsql;
         break;
     case 'sqlsrv':

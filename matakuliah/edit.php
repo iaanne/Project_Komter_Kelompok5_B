@@ -6,7 +6,7 @@ if(!isset($_SESSION['logged_in'])) {
 }
 
 $active_db = $_GET['db'] ?? 'mysql';
-$kode_mk = $_GET['kode_mk'];
+$kodeMK = $_GET['kodeMK'];
 
 switch($active_db) {
     case 'pgsql':
@@ -26,9 +26,9 @@ $message = '';
 $error = '';
 
 // Ambil data matakuliah
-$sql = "SELECT * FROM matakuliah WHERE kode_mk = :kode_mk";
+$sql = "SELECT * FROM matkul WHERE kodeMK = :kodeMK";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([':kode_mk' => $kode_mk]);
+$stmt->execute([':kodeMK' => $kodeMK]);
 $mk = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if(!$mk) {
@@ -37,16 +37,18 @@ if(!$mk) {
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nama_mk = $_POST['nama_mk'];
+    $namaMK = $_POST['namaMK'];
     $sks = $_POST['sks'];
+    $smt = $_POST['smt'];
     
     try {
-        $sql = "UPDATE matakuliah SET nama_mk = :nama_mk, sks = :sks WHERE kode_mk = :kode_mk";
+        $sql = "UPDATE matkul SET namaMK = :namaMK, sks = :sks, smt = :smt WHERE kodeMK = :kodeMK";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':nama_mk' => $nama_mk,
+            ':namaMK' => $namaMK,
             ':sks' => $sks,
-            ':kode_mk' => $kode_mk
+            ':smt' => $smt,
+            ':kodeMK' => $kodeMK
         ]);
         $message = "Data matakuliah berhasil diupdate!";
         header("refresh:2;url=index.php?db=$active_db");
@@ -91,15 +93,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <form method="POST">
                             <div class="mb-3">
                                 <label>Kode Matakuliah</label>
-                                <input type="text" class="form-control" value="<?= $mk['kode_mk'] ?>" disabled>
+                                <input type="text" class="form-control" value="<?= $mk['kodeMK'] ?>" disabled>
                             </div>
                             <div class="mb-3">
                                 <label>Nama Matakuliah</label>
-                                <input type="text" name="nama_mk" class="form-control" value="<?= $mk['nama_mk'] ?>" required>
+                                <input type="text" name="namaMK" class="form-control" value="<?= $mk['namaMK'] ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label>SKS</label>
                                 <input type="number" name="sks" class="form-control" value="<?= $mk['sks'] ?>" required min="1" max="6">
+                            </div>
+                            <div class="mb-3">
+                                <label>Semester</label>
+                                <input type="number" name="smt" class="form-control" value="<?= $mk['smt'] ?>" required min="1" max="8">
                             </div>
                             <button type="submit" class="btn btn-primary">Update</button>
                             <a href="index.php?db=<?= $active_db ?>" class="btn btn-secondary">Batal</a>

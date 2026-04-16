@@ -24,10 +24,19 @@ switch($active_db) {
 $message = '';
 $error = '';
 
+// Set default values
+if(empty($_POST)) {
+    $_POST = [];
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nip = $_POST['nip'];
-    $nama = $_POST['nama'];
-    $alamat = $_POST['alamat'];
+    $nip = isset($_POST['nip']) ? $_POST['nip'] : '';
+    $nama = isset($_POST['nama']) ? $_POST['nama'] : '';
+    $alamat = isset($_POST['alamat']) ? $_POST['alamat'] : '';
+    
+    if(!$nip || !$nama || !$alamat) {
+        $error = "Semua field harus diisi!";
+    } else {
     
     try {
         $sql = "INSERT INTO dosen (nip, nama, alamat) VALUES (:nip, :nama, :alamat)";
@@ -41,6 +50,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         header("refresh:2;url=index.php?db=$active_db");
     } catch(PDOException $e) {
         $error = "Gagal menambah data: " . $e->getMessage();
+    }
     }
 }
 ?>

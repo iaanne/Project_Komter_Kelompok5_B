@@ -5,8 +5,11 @@ if(!isset($_SESSION['logged_in'])) {
     exit();
 }
 
+require_once 'functions.php';
+
 // Pilih database yang akan digunakan
 $active_db = $_GET['db'] ?? 'mysql';
+setActiveDB($active_db);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -19,7 +22,7 @@ $active_db = $_GET['db'] ?? 'mysql';
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Sistem Akademik</a>
+            <a class="navbar-brand" href="#">Project Komter Kelompok 5-B</a>
             <div class="navbar-nav ms-auto">
                 <span class="nav-link">Welcome, <?= $_SESSION['username'] ?></span>
                 <a class="nav-link" href="logout.php">Logout</a>
@@ -30,10 +33,15 @@ $active_db = $_GET['db'] ?? 'mysql';
     <div class="container-fluid mt-3">
         <div class="row">
             <div class="col-md-2">
-                <div class="list-group">
-                    <a href="?db=mysql" class="list-group-item list-group-item-action <?= $active_db=='mysql'?'active':'' ?>">MySQL</a>
-                    <a href="?db=pgsql" class="list-group-item list-group-item-action <?= $active_db=='pgsql'?'active':'' ?>">PostgreSQL</a>
-                    <a href="?db=sqlsrv" class="list-group-item list-group-item-action <?= $active_db=='sqlsrv'?'active':'' ?>">SQL Server</a>
+                <div class="mb-3">
+                    <label class="form-label"><strong>Pilih Database:</strong></label>
+                    <form method="GET" id="dbForm">
+                        <select name="db" class="form-select" onchange="document.getElementById('dbForm').submit()">
+                            <option value="mysql" <?= $active_db=='mysql' ? 'selected' : '' ?>>MySQL</option>
+                            <option value="pgsql" <?= $active_db=='pgsql' ? 'selected' : '' ?>>PostgreSQL</option>
+                            <option value="sqlsrv" <?= $active_db=='sqlsrv' ? 'selected' : '' ?>>SQL Server</option>
+                        </select>
+                    </form>
                 </div>
                 <hr>
                 <div class="list-group">
@@ -46,13 +54,13 @@ $active_db = $_GET['db'] ?? 'mysql';
             <div class="col-md-10">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h5>Selamat Datang di Sistem Informasi Akademik</h5>
+                        <h5>Selamat Datang di Sistem Akademik</h5>
                     </div>
                     <div class="card-body">
                         <h5>Database Aktif: <?= strtoupper($active_db) ?></h5>
                         <p>Silakan pilih menu di samping untuk mengelola data.</p>
                         <div class="alert alert-info">
-                            <strong>Info:</strong> Sistem terhubung ke 3 database berbeda (MySQL, PostgreSQL, SQL Server)
+                            <strong>Info:</strong> Sistem terhubung ke 3 database berbeda (MySQL, PostgreSQL, SQL Server) Iziin~ 🫷 
                         </div>
                     </div>
                 </div>
